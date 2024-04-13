@@ -8,13 +8,14 @@ export type User = {
 
 export type Product = {
   _id?: string;
+  asin: string;
   url: string;
   currency: string;
   image: string;
   title: string;
   currentPrice: number;
   originalPrice: number;
-  priceHistory: PriceHistoryItem[] | [];
+  priceHistory?: PriceHistoryItem[] | [];
   highestPrice: number;
   lowestPrice: number;
   averagePrice: number;

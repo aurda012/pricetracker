@@ -81,6 +81,8 @@ export async function scrapeAmazonProduct(url: string) {
       .text()
       .trim();
 
+    console.log(stars);
+
     const category = $(
       "#wayfinding-breadcrumbs_feature_div ul.a-unordered-list li"
     )

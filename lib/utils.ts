@@ -9,6 +9,18 @@ const Notification = {
 
 const THRESHOLD_PERCENTAGE = 40;
 
+function createBookmark() {
+  const url = window.location.href;
+  if (window.sidebar) {
+    window.sidebar.bookmark(url, "Bookmark Title");
+  } else if (document.getElementById("msEdge")) {
+    // For Microsoft Edge
+    window.open(url, "_blank").focus();
+  } else {
+    alert("You must use Ctrl+D to bookmark this page.");
+  }
+}
+
 export function getAmazonASINFromURL(url: string) {
   const asinRegex = new RegExp("/dp/([A-Z0-9]{10})/");
   const match = url.match(asinRegex);

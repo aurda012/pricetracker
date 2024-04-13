@@ -22,6 +22,7 @@ const productSchema = new Schema(
     description: { type: String },
     category: { type: String },
     reviewsCount: { type: Number },
+    stars: { type: Number },
     isOutOfStock: { type: Boolean, default: false },
     users: [{ email: { type: String, required: true } }],
   },
