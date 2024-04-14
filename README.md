@@ -452,6 +452,70 @@ export async function generateEmailBody(
 </details>
 
 <details>
+<summary><code>scraperapi.ts</code></summary>
+
+```typescript
+import {
+  extractValueFromAmazonURL,
+  formatPricing,
+  getCurrencyFromPrice,
+  getDiscount,
+  returnDescription,
+} from "../utils";
+
+export async function scrapeAmazonProduct(url: string) {
+  const asin = extractValueFromAmazonURL(url);
+
+  if (!asin || asin === "") return;
+
+  try {
+    const req = await fetch(
+      `https://api.scraperapi.com/structured/amazon/product?api_key=${process.env.SCRAPER_API_KEY}&asin=${asin}&country_code=us&tld=com`
+    );
+
+    const prod = await req.json();
+
+    console.log(prod);
+
+    const result = {
+      asin,
+      url: `https://www.amazon.com/dp/${asin}`,
+      image: prod.images[0],
+      title: prod.name,
+      description: returnDescription(prod),
+      currency: getCurrencyFromPrice(prod.pricing) || "$",
+      currentPrice: formatPricing(prod.pricing),
+      originalPrice: formatPricing(prod.list_price),
+      discountRate: getDiscount(prod.pricing, prod.list_price),
+      priceHistory: [
+        {
+          price: formatPricing(prod.pricing),
+          date: new Date(),
+        },
+      ],
+      category:
+        prod.product_category === ""
+          ? ""
+          : prod.product_category.split(" › ").pop(),
+      reviewsCount: prod.total_reviews,
+      stars: prod.average_rating,
+      isOutOfStock: prod.availability_status === "In Stock" ? false : true,
+      lowestPrice: formatPricing(prod.pricing),
+      highestPrice: formatPricing(prod.list_price),
+      averagePrice: formatPricing(prod.pricing),
+    };
+
+    return result;
+  } catch (error: any) {
+    console.error(error.message);
+    throw new Error(`Failed to scrape Amazon product: ${error.message}`);
+  }
+}
+```
+
+</details>
+
+<details>
 <summary><code>index.scraper.ts</code></summary>
 
 ```typescript
@@ -553,15 +617,20 @@ export async function scrapeAmazonProduct(url: string) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverActions: true,
     serverComponentsExternalPackages: ["mongoose"],
   },
   images: {
-    domains: ["m.media-amazon.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+        port: "",
+      },
+    ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
 ```
 
 </details>
@@ -685,55 +754,71 @@ const Notification = {
 
 const THRESHOLD_PERCENTAGE = 40;
 
-// Extracts and returns the price from a list of possible elements.
+export function returnDescription(prod: any) {
+  if (prod.small_description) {
+    return prod.small_description;
+  } else if (prod.feature_bullets) {
+    return prod.feature_bullets.join(" ");
+  } else if (prod.full_description) {
+    return prod.full_description;
+  } else {
+    return "";
+  }
+}
+
+export function formatNumberString(number: number) {
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+  }).format(number);
+
+  return formatted;
+}
+
+export function getDiscount(curPrice: string, oriPrice: string) {
+  const currentPrice = formatPricing(curPrice);
+  const originalPrice = formatPricing(oriPrice);
+  const disc = ((originalPrice - currentPrice) / originalPrice) * 100;
+  return Math.round(disc);
+}
+
+export function formatPricing(price: string) {
+  let formattedPrice = price.replace("$", "").replace(",", "");
+  return Number(formattedPrice);
+}
+
+export function getCurrencyFromPrice(price: string) {
+  const regex = /[^0-9.,]+/; // match any non-digits and dots
+  const match = price.match(regex);
+  const currency = match ? match[0] : null; // get the first found currency symbol
+  return currency;
+}
+
+export function extractValueFromAmazonURL(url: string) {
+  const urlArray = url.split("/dp/");
+  const asinSide = urlArray[1];
+  const asin = asinSide.slice(0, 10);
+  return asin;
+}
+
 export function extractPrice(...elements: any) {
-  for (const element of elements) {
-    const priceText = element.text().trim();
-
-    if (priceText) {
-      const cleanPrice = priceText.replace(/[^\d.]/g, "");
-
-      let firstPrice;
-
-      if (cleanPrice) {
-        firstPrice = cleanPrice.match(/\d+\.\d{2}/)?.[0];
+  // priceText.replace(/\D/g, "")
+  let price = "";
+  for (const [index, element] of elements.entries()) {
+    if (element) {
+      const priceText = element.text().trim();
+      if (priceText) {
+        price += `${priceText.replace("$", "")}${
+          index === 0 ? (priceText.includes(".") ? "" : ".") : ""
+        }`;
       }
-
-      return firstPrice || cleanPrice;
     }
   }
-
-  return "";
+  return price;
 }
 
-// Extracts and returns the currency symbol from an element.
 export function extractCurrency(element: any) {
-  const currencyText = element.text().trim().slice(0, 1);
+  const currencyText = element.text().trim();
   return currencyText ? currencyText : "";
-}
-
-// Extracts description from two possible elements from amazon
-export function extractDescription($: any) {
-  // these are possible elements holding description of the product
-  const selectors = [
-    ".a-unordered-list .a-list-item",
-    ".a-expander-content p",
-    // Add more selectors here if needed
-  ];
-
-  for (const selector of selectors) {
-    const elements = $(selector);
-    if (elements.length > 0) {
-      const textContent = elements
-        .map((_: any, element: any) => $(element).text().trim())
-        .get()
-        .join("\n");
-      return textContent;
-    }
-  }
-
-  // If no matching elements were found, return an empty string
-  return "";
 }
 
 export function getHighestPrice(priceList: PriceHistoryItem[]) {

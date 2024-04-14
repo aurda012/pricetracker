@@ -1,8 +1,6 @@
-import { format } from "path";
 import {
   extractValueFromAmazonURL,
   formatPricing,
-  getAmazonASINFromURL,
   getCurrencyFromPrice,
   getDiscount,
   returnDescription,

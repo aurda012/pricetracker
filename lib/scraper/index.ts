@@ -1,6 +1,10 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { extractCurrency, extractPrice, getAmazonASINFromURL } from "../utils";
+import {
+  extractCurrency,
+  extractPrice,
+  extractValueFromAmazonURL,
+} from "../utils";
 
 export async function scrapeAmazonProduct(url: string) {
   if (!url) return;
@@ -96,7 +100,7 @@ export async function scrapeAmazonProduct(url: string) {
 
     // const asin = $("input#ASIN").attr("value");
 
-    const asin = getAmazonASINFromURL(url);
+    const asin = extractValueFromAmazonURL(url);
 
     const data = {
       asin,
