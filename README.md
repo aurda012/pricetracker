@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/-MongoDB-black?style=for-the-badge&logoColor=white&logo=mongodb&color=47A248" alt="mongodb" />
   </div>
 
-  <h3 align="center">A E-Commerce Price Tracking Application</h3>
+  <h3 align="center">An E-Commerce Price Tracking Application</h3>
 
 </div>
 
