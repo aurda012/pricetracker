@@ -1,6 +1,6 @@
 <div align="center">
   <br />
-    <img src="https://github.com/adrianhajdin/pricewise/assets/151519281/315377f2-0307-4ac2-87e0-55e053ca094b" alt="Project Banner">
+    <img src="https://raw.githubusercontent.com/aurda012/pricetracker/main/public/github-banner.png" alt="Project Banner">
   <br />
 
   <div>
