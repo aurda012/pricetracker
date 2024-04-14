@@ -1,11 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import {
-  extractCurrency,
-  extractPrice,
-  getAmazonASINFromURL,
-  getAsinFromUrl,
-} from "../utils";
+import { extractCurrency, extractPrice, getAmazonASINFromURL } from "../utils";
 
 export async function scrapeAmazonProduct(url: string) {
   if (!url) return;
@@ -32,14 +27,25 @@ export async function scrapeAmazonProduct(url: string) {
 
     // Extract product title
     const title = $("#productTitle").text().trim();
-    const currentPrice = extractPrice(
-      $(".reinventPricePriceToPayMargin span.a-price-whole").first(),
-      $(".reinventPricePriceToPayMargin span.a-price-fraction").first()
-    );
+
+    // let currentPrice = "";
+    // const currentPrice = extractPrice(
+    //   $("span.reinventPricePriceToPayMargin span span.a-price-whole").first(),
+    //   $("span.reinventPricePriceToPayMargin span span.a-price-fraction").first()
+    // );
+
+    let currentPrice = "";
+    $(".a-price.reinventPricePriceToPayMargin").each((i, elem) => {
+      const wholePrice = $(elem).find(".a-price-whole").text();
+      const fractionPrice = $(elem).find(".a-price-fraction").text();
+      currentPrice = `${wholePrice}.${fractionPrice}`;
+    });
 
     const originalPrice = extractPrice(
       $(".basisPrice span.a-text-price span.a-offscreen").first()
     );
+
+    console.log({ title, currentPrice, originalPrice });
 
     const outOfStock = $("#availability span")
       .text()
@@ -81,8 +87,6 @@ export async function scrapeAmazonProduct(url: string) {
       .text()
       .trim();
 
-    console.log(stars);
-
     const category = $(
       "#wayfinding-breadcrumbs_feature_div ul.a-unordered-list li"
     )
@@ -121,6 +125,7 @@ export async function scrapeAmazonProduct(url: string) {
 
     return data;
   } catch (error: any) {
+    console.error(error);
     throw new Error(`Failed to scrape Amazon product: ${error.message}`);
   }
 }

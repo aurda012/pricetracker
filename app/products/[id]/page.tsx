@@ -2,7 +2,7 @@ import Modal from "@/components/Modal";
 import PriceInfoCard from "@/components/PriceInfoCard";
 import ProductCard from "@/components/ProductCard";
 import { getProductById, getSimilarProducts } from "@/lib/actions";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, formatNumberString } from "@/lib/utils";
 import { Product } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -86,11 +86,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             <div className="flex flex-col gap-2">
               <p className="text-[34px] text-secondary font-bold">
                 {product.currency}
-                {product.currentPrice}
+                {formatNumberString(product.currentPrice)}
               </p>
               <p className="text-[21px] text-black opacity-50 line-through">
                 {product.currency}
-                {product.originalPrice}
+                {formatNumberString(product.originalPrice)}
               </p>
             </div>
 
@@ -133,22 +133,30 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title="Current Price"
                 iconSrc="/assets/icons/price-tag.svg"
-                value={`${product.currency}${product.currentPrice}`}
+                value={`${product.currency}${formatNumberString(
+                  product.currentPrice
+                )}`}
               />
               <PriceInfoCard
                 title="Average Price"
                 iconSrc="/assets/icons/chart.svg"
-                value={`${product.currency}${product.averagePrice}`}
+                value={`${product.currency}${formatNumberString(
+                  product.averagePrice
+                )}`}
               />
               <PriceInfoCard
                 title="Highest Price"
                 iconSrc="/assets/icons/arrow-up.svg"
-                value={`${product.currency}${product.highestPrice}`}
+                value={`${product.currency}${formatNumberString(
+                  product.highestPrice
+                )}`}
               />
               <PriceInfoCard
                 title="Lowest Price"
                 iconSrc="/assets/icons/arrow-down.svg"
-                value={`${product.currency}${product.lowestPrice}`}
+                value={`${product.currency}${formatNumberString(
+                  product.lowestPrice
+                )}`}
               />
             </div>
           </div>

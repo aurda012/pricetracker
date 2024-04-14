@@ -9,16 +9,31 @@ const Notification = {
 
 const THRESHOLD_PERCENTAGE = 40;
 
-function createBookmark() {
-  const url = window.location.href;
-  if (window.sidebar) {
-    window.sidebar.bookmark(url, "Bookmark Title");
-  } else if (document.getElementById("msEdge")) {
-    // For Microsoft Edge
-    window.open(url, "_blank").focus();
-  } else {
-    alert("You must use Ctrl+D to bookmark this page.");
-  }
+export function formatNumberString(number: number) {
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+  }).format(number);
+
+  return formatted;
+}
+
+export function getDiscount(curPrice: string, oriPrice: string) {
+  const currentPrice = formatPricing(curPrice);
+  const originalPrice = formatPricing(oriPrice);
+  const disc = ((originalPrice - currentPrice) / originalPrice) * 100;
+  return Math.round(disc);
+}
+
+export function formatPricing(price: string) {
+  let formattedPrice = price.replace("$", "").replace(",", "");
+  return Number(formattedPrice);
+}
+
+export function getCurrencyFromPrice(price: string) {
+  const regex = /[^0-9.,]+/; // match any non-digits and dots
+  const match = price.match(regex);
+  const currency = match ? match[0] : null; // get the first found currency symbol
+  return currency;
 }
 
 export function getAmazonASINFromURL(url: string) {

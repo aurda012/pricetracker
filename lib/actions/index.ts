@@ -3,9 +3,10 @@
 import { User } from "@/types";
 import Product from "../database/models/product.model";
 import { connectToDB } from "../database/mongoose";
-import { scrapeAmazonProduct } from "../scraper";
+import { scrapeAmazonProduct } from "../scraper/scraperapi";
 import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
 import { revalidatePath } from "next/cache";
+import { generateEmailBody, sendEmail } from "../nodemailer";
 
 export async function scrapeAndStoreProduct(productUrl: string) {
   if (!productUrl) return;
@@ -14,6 +15,8 @@ export async function scrapeAndStoreProduct(productUrl: string) {
     await connectToDB();
 
     const scrapedProduct = await scrapeAmazonProduct(productUrl);
+
+    console.log(scrapedProduct);
 
     if (!scrapedProduct) return;
 
@@ -123,9 +126,9 @@ export async function addUserEmailToProduct(
 
       await product.save();
 
-      // const emailContent = await generateEmailBody(product, "WELCOME");
+      const emailContent = await generateEmailBody(product, "WELCOME");
 
-      // await sendEmail(emailContent, [userEmail]);
+      await sendEmail(emailContent, [userEmail]);
     }
   } catch (error) {
     console.log(error);
