@@ -49,34 +49,10 @@ export function getCurrencyFromPrice(price: string) {
 }
 
 export function extractValueFromAmazonURL(url: string) {
-  // // Extract the path from the URL
-  // const urlParts = url.split("/");
-  // const path = urlParts[urlParts.length - 1];
-
-  // // Find the position of the product ID
-  // const idIndex = path.indexOf("/dp/") + 1;
-
-  // // Extract the product ID
-  // const productId = path.substring(idIndex, idIndex + 10); // Assuming product ID is 10 characters long
-
-  // return productId;
-
   const urlArray = url.split("/dp/");
   const asinSide = urlArray[1];
   const asin = asinSide.slice(0, 10);
   return asin;
-}
-
-export function getAmazonASINFromURL(url: string) {
-  // const asinRegex = new RegExp("/dp/([A-Z0-9]{10})/");
-  const asinRegex = new RegExp("/dp/(w{10})");
-  const match = url.match(asinRegex);
-
-  if (match) {
-    return match[1]; // returns B00HYHRZ0U in this case
-  } else {
-    return "ASIN not found";
-  }
 }
 
 export function extractPrice(...elements: any) {
