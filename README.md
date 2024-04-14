@@ -99,7 +99,7 @@ EMAIL_USER=
 EMAIL_PASS=
 
 #SCRAPERAPI
-SCRAPER_API_KEY
+SCRAPER_API_KEY=
 ```
 
 Replace the placeholder values with your actual credentials. You can obtain these credentials by signing up on these specific websites from [BrightData](https://brightdata.com/), [MongoDB](https://www.mongodb.com/), [Node Mailer](https://nodemailer.com/), and [ScraperApi](https://www.scraperapi.com/)
