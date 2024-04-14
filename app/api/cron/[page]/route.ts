@@ -15,14 +15,20 @@ export const maxDuration = 300; // This function can run for a maximum of 300 se
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: any }) {
+  const { page } = params;
+
+  const skipAmount = (page - 1) * 4;
+
   try {
     connectToDB();
 
-    const products = await Product.find({});
+    const products = await Product.find({})
+      .sort({ createdAt: "desc" })
+      .skip(skipAmount)
+      .limit(4);
 
-    if (!products) {
-      throw new Error("No product fetched");
+    if (products.length === 0) {
       return NextResponse.json({
         message: "No products to update",
       });
