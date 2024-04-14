@@ -9,6 +9,18 @@ const Notification = {
 
 const THRESHOLD_PERCENTAGE = 40;
 
+export function returnDescription(prod: any) {
+  if (prod.small_description) {
+    return prod.small_description;
+  } else if (prod.feature_bullets) {
+    return prod.feature_bullets.join(" ");
+  } else if (prod.full_description) {
+    return prod.full_description;
+  } else {
+    return "";
+  }
+}
+
 export function formatNumberString(number: number) {
   const formatted = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
@@ -36,8 +48,28 @@ export function getCurrencyFromPrice(price: string) {
   return currency;
 }
 
+export function extractValueFromAmazonURL(url: string) {
+  // // Extract the path from the URL
+  // const urlParts = url.split("/");
+  // const path = urlParts[urlParts.length - 1];
+
+  // // Find the position of the product ID
+  // const idIndex = path.indexOf("/dp/") + 1;
+
+  // // Extract the product ID
+  // const productId = path.substring(idIndex, idIndex + 10); // Assuming product ID is 10 characters long
+
+  // return productId;
+
+  const urlArray = url.split("/dp/");
+  const asinSide = urlArray[1];
+  const asin = asinSide.slice(0, 10);
+  return asin;
+}
+
 export function getAmazonASINFromURL(url: string) {
-  const asinRegex = new RegExp("/dp/([A-Z0-9]{10})/");
+  // const asinRegex = new RegExp("/dp/([A-Z0-9]{10})/");
+  const asinRegex = new RegExp("/dp/(w{10})");
   const match = url.match(asinRegex);
 
   if (match) {

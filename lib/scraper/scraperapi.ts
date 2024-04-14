@@ -1,15 +1,17 @@
 import { format } from "path";
 import {
+  extractValueFromAmazonURL,
   formatPricing,
   getAmazonASINFromURL,
   getCurrencyFromPrice,
   getDiscount,
+  returnDescription,
 } from "../utils";
 
 export async function scrapeAmazonProduct(url: string) {
-  const asin = getAmazonASINFromURL(url);
+  const asin = extractValueFromAmazonURL(url);
 
-  if (!asin) return;
+  if (!asin || asin === "") return;
 
   try {
     const req = await fetch(
@@ -18,12 +20,14 @@ export async function scrapeAmazonProduct(url: string) {
 
     const prod = await req.json();
 
+    console.log(prod);
+
     const result = {
       asin,
       url: `https://www.amazon.com/dp/${asin}`,
       image: prod.images[0],
       title: prod.name,
-      description: prod.feature_bullets.join(" "),
+      description: returnDescription(prod),
       currency: getCurrencyFromPrice(prod.pricing) || "$",
       currentPrice: formatPricing(prod.pricing),
       originalPrice: formatPricing(prod.list_price),
@@ -34,7 +38,10 @@ export async function scrapeAmazonProduct(url: string) {
           date: new Date(),
         },
       ],
-      category: prod.product_category,
+      category:
+        prod.product_category === ""
+          ? ""
+          : prod.product_category.split(" › ").pop(),
       reviewsCount: prod.total_reviews,
       stars: prod.average_rating,
       isOutOfStock: prod.availability_status === "In Stock" ? false : true,
