@@ -26,6 +26,9 @@ export async function GET(request: Request) {
     // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
+        const delay = (ms: number) =>
+          new Promise((resolve) => setTimeout(resolve, ms));
+
         // Scrape product
         const scrapedProduct = await scrapeAmazonProduct(currentProduct.url);
 
@@ -77,6 +80,8 @@ export async function GET(request: Request) {
           // Send email notification
           await sendEmail(emailContent, userEmails);
         }
+
+        await delay(5000);
 
         return updatedProduct;
       })
